@@ -82,3 +82,31 @@ body {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+
+.tag.coral { border-color: var(--coral); color: var(--coral); }
+.tag.ice   { border-color: var(--ice);   color: var(--ice); }
+
+.card.light { background: var(--paper); color: var(--ink); }
+.card.light .tag { border-color: var(--blue); color: var(--blue); }
+
+.btn {
+  display: inline-block;
+  padding: 13px 22px;
+  border: 2px solid var(--paper);
+  border-radius: 999px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.btn:hover { background: var(--mint); border-color: var(--mint); color: var(--ink); }
+.btn.main { background: var(--paper); color: var(--blue); }
+.btn.main:hover { background: var(--mint); color: var(--ink); }
+.card.light .btn { border-color: var(--ink); color: var(--ink); }
+.card.light .btn:hover { background: var(--ink); color: var(--paper); }
+
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--mint);
+  animation: pulse 1.8s ease-in-out infinite;
+}

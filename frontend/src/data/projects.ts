@@ -1,0 +1,100 @@
+import type { Project } from "./types";
+
+export const projects: Project[] = [
+  {
+    slug: "jouiha",
+    number: "01",
+    title: "Jouiha — Gaming marketplace for Algeria",
+    kind: "Featured · 2026",
+    featured: true,
+    demoUrl: "https://jouiha.vercel.app/",
+    summary:
+      "Consoles, games, accounts, subscriptions and accessories in four brand worlds: PlayStation, Xbox, Nintendo and Legendary/Retro.",
+    bullets: [
+      "Three roles: individual sellers, contract-validated MarketStores, and a Super Admin with moderation, reports and disputes.",
+      "JWT auth, built-in messaging with read receipts, purchase flow with order tracking, public seller profiles.",
+      "Algerian-friendly payments: cash or BaridiMob on delivery.",
+    ],
+    tags: [
+      { name: "Next.js" }, { name: "TypeScript" }, { name: "Django REST" },
+      { name: "PostgreSQL" }, { name: "JWT" },
+    ],
+  },
+  {
+    slug: "lumiere-boutique",
+    number: "02",
+    title: "Lumière Boutique",
+    kind: "E-commerce · Client project",
+    summary: "Modest-fashion storefront built for a real client.",
+    bullets: [
+      "Prices in DZD, cash on delivery, FR / AR / EN with RTL.",
+      "Admin dashboard, email OTP signup, single-super-admin security model.",
+    ],
+    tags: [{ name: "React" }, { name: "Django REST" }, { name: "i18n · RTL", tone: "coral" }],
+  },
+  {
+    slug: "academic-portfolio",
+    number: "03",
+    title: "Academic Portfolio Site",
+    kind: "For a university Vice-Rector · 2026",
+    summary: "Professional portfolio with career timeline, publications, certifications and downloadable CV.",
+    bullets: ["Four languages (FR, EN, AR, RU) with RTL support."],
+    tags: [{ name: "HTML5" }, { name: "CSS3" }, { name: "JavaScript" }],
+  },
+  {
+    slug: "intranet-maintenance",
+    number: "04",
+    title: "Intranet Maintenance System",
+    kind: "IT support platform · Algérie Télécom",
+    summary: "Internal IT support platform built during the internship.",
+    bullets: ["Admin React SPA with eight pages: dashboard, tickets, assets, audit logs."],
+    tags: [{ name: "React" }, { name: "TypeScript" }, { name: "FastAPI" }, { name: "PostgreSQL" }],
+  },
+  {
+    slug: "edufun",
+    number: "05",
+    title: "EDUFUN",
+    kind: "Mobile app · Academic project",
+    summary: "Gamified learning app for children.",
+    bullets: ["Ages 4–12 with adaptive difficulty, rewards and a parental-control dashboard."],
+    tags: [{ name: "Flutter" }, { name: "Dart" }, { name: "Django" }, { name: "MySQL" }],
+  },
+  {
+    slug: "dz-kitab",
+    number: "06",
+    title: "DZ-KITAB",
+    kind: "Second-hand books · Academic project",
+    summary: "Marketplace for second-hand books.",
+    bullets: ["Email-OTP signup, ISBN-assisted listings via Open Library, protected purchase requests."],
+    tags: [{ name: "REST API" }, { name: "Cloudinary" }, { name: "Open Library", tone: "ice" }],
+  },
+  {
+    slug: "explodz",
+    number: "07",
+    title: "EXPLODZ",
+    kind: "Tourism platform · Academic project",
+    summary: "Tourism website for Algeria.",
+    bullets: ["WordPress site with interactive Leaflet maps, search, SEO and security hardening."],
+    tags: [{ name: "WordPress" }, { name: "PHP" }, { name: "SEO", tone: "ice" }],
+  },
+  {
+    slug: "apollo-crm-tool",
+    number: "08",
+    title: "Apollo CRM Tool",
+    kind: "Personal project",
+    summary: "Contact-collection tool for prospecting.",
+    bullets: ["Python tool collecting professional contacts through the Apollo.io API into SQLite, with CSV export."],
+    tags: [{ name: "Python" }, { name: "SQLite" }, { name: "REST API", tone: "ice" }],
+  },
+  {
+    slug: "simpto",
+    number: "09",
+    title: "Simpto",
+    kind: "Travel booking · My first full-stack project, Oct 2024",
+    summary: "Flights, hotels and packages, built in 20 days.",
+    bullets: ["My first complete full-stack project."],
+    tags: [{ name: "JavaScript" }, { name: "Node.js" }, { name: "PostgreSQL" }],
+  },
+];
+
+export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
