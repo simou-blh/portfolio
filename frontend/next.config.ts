@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "export",              // plain HTML/JS/CSS, no server needed
+  trailingSlash: true,           // /projects/jouiha/ works on any static host
+  images: { unoptimized: true }, // no image optimizer in static export
+  
   turbopack: {
     rules: {
       "*.css": {
