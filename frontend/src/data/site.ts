@@ -2,7 +2,7 @@ export const site = {
   name: "Ahmed Ouassim Boulouh",
   short: "A.O. Boulouh",
   tagline:
-    "Computer Science student and full-stack developer building secure, useful products for Algeria.",
+    "Computer Science student and full-stack developer I build web apps and secure them, with the mindset of a developer and the curiosity of an attacker. You can't imagine how much value I can bring to your team, and how fast I learn.",
   status: "Open to internships & opportunities",
   location: "Guelma, Algeria",
   linkedin: "https://www.linkedin.com/in/boulouh-ahmed-ouassim/",
