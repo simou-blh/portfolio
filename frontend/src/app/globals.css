@@ -110,3 +110,37 @@ body {
   background: var(--mint);
   animation: pulse 1.8s ease-in-out infinite;
 }
+
+
+.blueprint {
+  background-color: var(--blue);
+  background-image:
+    linear-gradient(rgba(243, 241, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243, 241, 255, 0.1) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.marquee:hover { animation-play-state: paused; }
+
+.lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.lift:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: var(--shadow-hard-lg);
+}
+
+.blueprint {
+  background-color: var(--blue);
+  background-image:
+    linear-gradient(rgba(243, 241, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243, 241, 255, 0.1) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
