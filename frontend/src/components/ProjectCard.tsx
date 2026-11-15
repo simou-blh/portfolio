@@ -5,7 +5,7 @@ import Tag from "./Tag";
 export default function ProjectCard({ p }: { p: Project }) {
   const href = `/projects/${p.slug}/`;
   return (
-    <article className={`card ${p.featured ? "light mb-[22px]" : ""}`}>
+    <article className={`card lift ${p.featured ? "light mb-[22px]" : "h-full"}`}>
       {p.featured ? (
         <span className="mb-2.5 inline-block rounded-full bg-mint px-3 py-1 text-[0.8rem] font-extrabold text-ink">
           {p.kind}
