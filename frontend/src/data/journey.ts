@@ -9,6 +9,12 @@ export const journey: JourneyEntry[] = [
     period: "Jun 2026",
     bullets: ["Software design and full-stack development for an internal IT support platform."],
     hasPage: true,
+    description: "Internship at Algérie Télécom in Guelma, working in a team on an internal IT support platform.",
+highlights: [
+  "Software design and full-stack development for an internal IT support platform.",
+  "Built the admin interface as a React SPA with eight pages: dashboard, tickets, assets and audit logs.",
+  "Vite, React and TypeScript on the front, FastAPI and PostgreSQL on the back.",
+],
   },
   {
     slug: "estin",
@@ -18,6 +24,7 @@ export const journey: JourneyEntry[] = [
     period: "Sep 2023 – Jul 2028",
     bullets: ["Algorithms and complexity, relational databases, operations research, cryptography."],
     hasPage: true,
+    description: "Computer Science degree at ESTIN, Guelma, with a focus on cybersecurity.",   
   },
   {
     slug: "baccalaureate",

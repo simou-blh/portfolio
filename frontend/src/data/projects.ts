@@ -19,6 +19,21 @@ export const projects: Project[] = [
       { name: "Next.js" }, { name: "TypeScript" }, { name: "Django REST" },
       { name: "PostgreSQL" }, { name: "JWT" },
     ],
+    year: "2026",
+role: "Full-stack developer",
+overview:
+  "A gaming marketplace for the Algerian market, inspired by Ouedkniss but focused on consoles, games, accounts, subscriptions and accessories. The catalogue is organised into four brand worlds, and the platform supports individual sellers, contract-validated MarketStores and a Super Admin team.",
+highlights: [
+  "Django REST backend split into accounts, catalog, stores, trade, messaging and moderation apps, with email-based JWT authentication.",
+  "Brand pages for PlayStation, Xbox, Nintendo and Legendary/Retro, each with its own theme, animated background, tabs and multi-select filters.",
+  "Built-in messaging with unread badges and read receipts, plus a purchase flow: the buyer proposes, the seller confirms, the product flips to sold.",
+  "Public seller profiles and an account area with listings, purchases and sales.",
+  "Super Admin moderation: MarketStore validation, reports, disputes, platform stats and an activity log.",
+],
+challenges: [
+  "Messaging without WebSockets: the MVP spec rules them out, so conversations use polling with unread counts and read receipts.",
+  "Privacy by design: transaction endpoints are scoped server-side to the current user, and public profiles never expose email or phone.",
+],
   },
   {
     slug: "lumiere-boutique",
@@ -31,6 +46,17 @@ export const projects: Project[] = [
       "Admin dashboard, email OTP signup, single-super-admin security model.",
     ],
     tags: [{ name: "React" }, { name: "Django REST" }, { name: "i18n · RTL", tone: "coral" }],
+    role: "Full-stack developer",
+overview: "A premium modest-fashion storefront built for a real client in the Algerian market, with prices in DZD and cash on delivery.",
+highlights: [
+  "French, Arabic and English with full RTL support.",
+  "Glassmorphism design with a canvas-animated background.",
+  "Admin dashboard for managing products.",
+  "Django REST backend with JWT auth and email OTP verification at signup.",
+],
+challenges: [
+  "Security model: exactly one super admin (the client) who alone can create or remove staff admins, and registering a second super admin fails by design.",
+],
   },
   {
     slug: "academic-portfolio",
@@ -49,6 +75,12 @@ export const projects: Project[] = [
     summary: "Internal IT support platform built during the internship.",
     bullets: ["Admin React SPA with eight pages: dashboard, tickets, assets, audit logs."],
     tags: [{ name: "React" }, { name: "TypeScript" }, { name: "FastAPI" }, { name: "PostgreSQL" }],
+    year: "2026",
+role: "Frontend developer (team project)",
+highlights: [
+  "Admin interface built as a React SPA with eight pages, including dashboard, tickets, assets and audit logs.",
+  "Vite, React and TypeScript on the front, backed by a FastAPI and PostgreSQL API.",
+],
   },
   {
     slug: "edufun",
@@ -85,6 +117,12 @@ export const projects: Project[] = [
     summary: "Contact-collection tool for prospecting.",
     bullets: ["Python tool collecting professional contacts through the Apollo.io API into SQLite, with CSV export."],
     tags: [{ name: "Python" }, { name: "SQLite" }, { name: "REST API", tone: "ice" }],
+    role: "Personal project",
+highlights: [
+  "Collects professional contacts (name, company, country, job title, email) through the Apollo.io API.",
+  "Stores everything in SQLite with CSV export.",
+],
+challenges: ["Worked around Apollo free-plan endpoint restrictions and API authentication errors."],
   },
   {
     slug: "simpto",

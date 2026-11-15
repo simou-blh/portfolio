@@ -11,6 +11,13 @@ export type Project = {
   tags: Tech[];
   featured?: boolean;
   demoUrl?: string;
+  // detail-page fields (all optional)
+  repoUrl?: string;
+  year?: string;
+  role?: string;
+  overview?: string;
+  highlights?: string[];
+  challenges?: string[];
 };
 
 export type JourneyEntry = {
@@ -21,4 +28,7 @@ export type JourneyEntry = {
   period: string;
   bullets: string[];
   hasPage: boolean; // gets its own detail page
+  // detail-page fields (optional)
+  description?: string;
+  highlights?: string[];
 };

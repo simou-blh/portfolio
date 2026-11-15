@@ -18,7 +18,7 @@ export default function Hero() {
       <h1 className="text-[clamp(2.8rem,10.5vw,8.5rem)] font-extrabold leading-[0.92] tracking-[-0.035em]">
         Ahmed Ouassim <span className="text-mint">Boulouh.</span>
       </h1>
-      <p className="mt-7 max-w-[36ch] text-[clamp(1.1rem,2vw,1.55rem)] font-medium leading-[1.35] text-paper/90">
+      <p className="mt-7 max-w-[52ch] text-[clamp(1.1rem,2vw,1.55rem)] font-medium leading-[1.35] text-paper/90">
         {site.tagline}
       </p>
       <div className="mt-8 flex flex-wrap gap-3.5">

@@ -14,7 +14,7 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   title: "Ahmed Ouassim Boulouh — Portfolio",
   description:
-    "Computer Science student and full-stack developer building secure, useful products for Algeria.",
+    "Computer Science student and full-stack developer ,building secure, useful products for Algeria.",
 };
 
 export const viewport: Viewport = {
