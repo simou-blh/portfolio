@@ -24,9 +24,14 @@ export default function Hero() {
   return (
     <header
       id="top"
-      className="relative isolate grid items-center gap-x-8 gap-y-4 pb-[clamp(40px,7vw,90px)] pt-[clamp(16px,4vw,48px)] lg:grid-cols-[1.1fr_0.9fr]"
+      className="relative isolate flex min-h-[clamp(640px,92vh,880px)] flex-col justify-center gap-10 pb-[clamp(40px,7vw,90px)] pt-[clamp(16px,4vw,48px)]"
     >
-      <div>
+      {/* full-width badge layer, behind the text */}
+      <div className="absolute inset-y-0 left-1/2 z-0 w-screen -translate-x-1/2">
+        <HeroBadgeLoader />
+      </div>
+
+      <div className="pointer-events-none relative z-10 max-lg:mt-[340px] lg:max-w-[52%]">
         <Reveal y={16}>
           <div className="mb-6 inline-flex items-center gap-2.5 font-medium">
             <span className="dot" aria-hidden="true" />
@@ -54,7 +59,7 @@ export default function Hero() {
           </motion.div>
         </AnimatePresence>
         <Reveal delay={0.75}>
-          <div className="mt-8 flex flex-wrap gap-3.5">
+          <div className="pointer-events-auto mt-8 flex flex-wrap gap-3.5">
             <Magnetic>
               <a href="#projects" className="btn main">See my work</a>
             </Magnetic>
@@ -65,11 +70,7 @@ export default function Hero() {
         </Reveal>
       </div>
 
-      <div className="relative h-[480px] sm:h-[600px] lg:h-[700px]">
-        <HeroBadgeLoader />
-      </div>
-
-      <Reveal delay={0.9} className="mt-6 lg:col-span-2">
+      <Reveal delay={0.9} className="pointer-events-none relative z-10">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3.5">
           {stats.map((s) => (
             <div key={s.label} className="border-t-2 border-line pt-3">

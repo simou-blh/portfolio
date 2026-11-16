@@ -1,7 +1,7 @@
 "use client";
 
 import * as THREE from "three";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Canvas, extend, useFrame, useThree, type ThreeElement } from "@react-three/fiber";
 import { Environment, Lightformer, RoundedBox } from "@react-three/drei";
 import {
@@ -14,8 +14,8 @@ import {
   type RapierRigidBody,
 } from "@react-three/rapier";
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
-import { toggleSide, useSide } from "@/lib/side";
-import { CARD_RATIO, composeBadge, toTexture } from "@/lib/badgeTexture";
+import { toggleSide, useSide, type Side } from "@/lib/side";
+import { CARD_RATIO, composeBadge, composeStrap, toStrapTexture, toTexture } from "@/lib/badgeTexture";
 import { markSceneReady } from "@/lib/sceneReady";
 
 extend({ MeshLineGeometry, MeshLineMaterial });
@@ -29,17 +29,88 @@ declare module "@react-three/fiber" {
 
 const CARD_W = 1.6;
 const CARD_H = CARD_W / CARD_RATIO;
-const ANCHOR_Y = CARD_H / 2 + 0.2;
+const T = CARD_H / 2; // card top edge (local y)
+const CLASP_H = 0.8;
+const ANCHOR_Y = T + CLASP_H;
+
+const FOV = 25;
+const FIX_Y = 4;
+const SEG = 0.6; // rope segment length
+const STRAP_W = 0.34; // world width of the lanyard
+const STRAP_LW = STRAP_W / Math.tan((FOV / 2) * (Math.PI / 180));
+
+/** Pixels-per-unit based layout so the whole lanyard + card fits any canvas size. */
+function getLayout(w: number, h: number) {
+  const ppu = THREE.MathUtils.clamp(Math.min(w / 8, h / 5.3), 100, 175);
+  const visW = w / ppu;
+  const visH = h / ppu;
+  const j3y = FIX_Y - 3 * SEG;
+  const camY = j3y + 1.4 - visH / 2;
+  const z = visH / (2 * Math.tan((FOV / 2) * (Math.PI / 180)));
+  const anchorX = w / h > 1.15 ? visW * 0.18 : 0;
+  return { camY, z, anchorX };
+}
 
 const PHOTO_SRCS = ["/images/me.webp", "/images/me.png", "/images/me.jpg"];
 const BACK_PHOTO_SRCS = ["/images/hacker.webp", "/images/hacker.png", "/images/hacker.jpg"];
 
-type Textures = { front: THREE.CanvasTexture; back: THREE.CanvasTexture };
+type Textures = {
+  front: THREE.CanvasTexture;
+  back: THREE.CanvasTexture;
+  strap: Record<Side, THREE.CanvasTexture>;
+};
+
+function Rig() {
+  const { camera, size } = useThree();
+  useLayoutEffect(() => {
+    const l = getLayout(size.width, size.height);
+    camera.position.set(0, l.camY, l.z);
+    camera.updateProjectionMatrix();
+  }, [camera, size.width, size.height]);
+  return null;
+}
+
+function Clasp() {
+  const metal = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: "#d7dbe4", metalness: 1, roughness: 0.2 }),
+    [],
+  );
+  const dark = useMemo(() => new THREE.MeshStandardMaterial({ color: "#0a0f24", metalness: 0.3, roughness: 0.6 }), []);
+  return (
+    <group>
+      {/* ring through the card slot */}
+      <mesh position={[0, T - 0.01, 0]} rotation={[0, Math.PI / 2, 0]} material={metal}>
+        <torusGeometry args={[0.11, 0.022, 16, 40]} />
+      </mesh>
+      {/* lobster claw */}
+      <mesh position={[0, T + 0.25, 0]} scale={[0.72, 1.7, 1]} material={metal}>
+        <torusGeometry args={[0.1, 0.02, 14, 40]} />
+      </mesh>
+      <mesh position={[0.075, T + 0.25, 0]} material={metal}>
+        <boxGeometry args={[0.04, 0.15, 0.045]} />
+      </mesh>
+      {/* connector ring */}
+      <mesh position={[0, T + 0.46, 0]} rotation={[0, Math.PI / 2, 0]} material={metal}>
+        <torusGeometry args={[0.055, 0.016, 12, 32]} />
+      </mesh>
+      {/* crimp plate */}
+      <RoundedBox args={[0.3, 0.3, 0.07]} radius={0.035} smoothness={4} position={[0, T + 0.64, 0]} material={metal} />
+      <mesh position={[0, T + 0.6, 0]} material={dark}>
+        <boxGeometry args={[0.2, 0.05, 0.075]} />
+      </mesh>
+      <mesh position={[0, T + 0.77, 0]} material={dark}>
+        <boxGeometry args={[0.26, 0.035, 0.075]} />
+      </mesh>
+    </group>
+  );
+}
 
 function Band({ textures }: { textures: Textures | null }) {
   const side = useSide();
   const { size } = useThree();
   const res = useMemo(() => new THREE.Vector2(size.width, size.height), [size.width, size.height]);
+  const repeat = useMemo(() => new THREE.Vector2(-1.1, 1), []);
+  const [anchorX] = useState(() => getLayout(size.width, size.height).anchorX);
 
   const band = useRef<THREE.Mesh>(null!);
   const fixed = useRef<RapierRigidBody>(null!);
@@ -72,9 +143,9 @@ function Band({ textures }: { textures: Textures | null }) {
     linearDamping: 2,
   };
 
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], SEG]);
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], SEG]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], SEG]);
   useSphericalJoint(j3, card, [[0, 0, 0], [0, ANCHOR_Y, 0]]);
 
   useEffect(() => {
@@ -109,7 +180,7 @@ function Band({ textures }: { textures: Textures | null }) {
       ([[j1, lerp1], [j2, lerp2]] as const).forEach(([r, l]) => {
         const t = r.current.translation();
         const clamped = Math.max(0.1, Math.min(1, l.distanceTo(t as THREE.Vector3)));
-        l.lerp(t as THREE.Vector3, delta * (minSpeed + clamped * (maxSpeed - minSpeed)));
+        l.lerp(t as THREE.Vector3, Math.min(1, delta * (minSpeed + clamped * (maxSpeed - minSpeed))));
       });
       curve.points[0].copy(j3.current.translation() as THREE.Vector3);
       curve.points[1].copy(lerp2);
@@ -137,26 +208,25 @@ function Band({ textures }: { textures: Textures | null }) {
 
   return (
     <>
-      <group position={[0, 4, 0]}>
+      <group position={[anchorX, FIX_Y, 0]}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
-        <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
+        <RigidBody position={[0.3, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps}>
+        <RigidBody position={[0.6, 0, 0]} ref={j2} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps}>
+        <RigidBody position={[0.9, 0, 0]} ref={j3} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
         <RigidBody
-          position={[2, 0, 0]}
+          position={[1.5, 0, 0]}
           ref={card}
           {...segmentProps}
           type={dragged ? "kinematicPosition" : "dynamic"}
         >
           <CuboidCollider args={[CARD_W / 2, CARD_H / 2, 0.03]} />
           <group
-            ref={flip}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerDown={(e) => {
@@ -171,6 +241,7 @@ function Band({ textures }: { textures: Textures | null }) {
               if (d < 6 && performance.now() - down.current.t < 450) toggleSide();
             }}
           >
+            <group ref={flip}>
             <RoundedBox args={[CARD_W - 0.01, CARD_H - 0.01, 0.035]} radius={0.075} smoothness={4}>
               <meshStandardMaterial color={edge} metalness={0.6} roughness={0.35} />
             </RoundedBox>
@@ -186,23 +257,22 @@ function Band({ textures }: { textures: Textures | null }) {
                 </mesh>
               </>
             )}
-            {/* metal clip */}
-            <group position={[0, CARD_H / 2, 0]}>
-              <mesh position={[0, 0.01, 0]}>
-                <boxGeometry args={[0.3, 0.14, 0.05]} />
-                <meshStandardMaterial color="#c9ced8" metalness={1} roughness={0.22} />
-              </mesh>
-              <mesh position={[0, 0.2, 0]}>
-                <torusGeometry args={[0.07, 0.02, 12, 24]} />
-                <meshStandardMaterial color="#c9ced8" metalness={1} roughness={0.22} />
-              </mesh>
             </group>
+            <Clasp />
           </group>
         </RigidBody>
       </group>
       <mesh ref={band} frustumCulled={false}>
         <meshLineGeometry />
-        <meshLineMaterial args={[{ resolution: res, lineWidth: 0.32 }]} resolution={res} color={bandColor} lineWidth={0.32} />
+        <meshLineMaterial
+          args={[{ resolution: res, lineWidth: STRAP_LW }]}
+          resolution={res}
+          lineWidth={STRAP_LW}
+          color={textures ? "white" : bandColor}
+          useMap={textures ? 1 : 0}
+          map={textures?.strap[side]}
+          repeat={repeat}
+        />
       </mesh>
     </>
   );
@@ -217,12 +287,15 @@ export default function HeroBadge({ active = true }: { active?: boolean }) {
     Promise.all([
       composeBadge("/images/badge-front.png", PHOTO_SRCS),
       composeBadge("/images/badge-back.png", BACK_PHOTO_SRCS),
-    ]).then(([f, b]) => {
+      composeStrap("dev"),
+      composeStrap("sec"),
+    ]).then(([f, b, sd, ss]) => {
       if (!alive) return;
       const front = toTexture(f);
       const back = toTexture(b);
-      made.push(front, back);
-      setTextures({ front, back });
+      const strap = { dev: toStrapTexture(sd), sec: toStrapTexture(ss) };
+      made.push(front, back, strap.dev, strap.sec);
+      setTextures({ front, back, strap });
       markSceneReady();
     });
     return () => {
@@ -233,12 +306,13 @@ export default function HeroBadge({ active = true }: { active?: boolean }) {
 
   return (
     <Canvas
-      camera={{ position: [0, 0.2, 9.5], fov: 25 }}
+      camera={{ position: [0, 0, 12], fov: FOV }}
       dpr={[1, 2]}
       gl={{ alpha: true, antialias: true }}
       frameloop={active ? "always" : "never"}
       style={{ opacity: textures ? 1 : 0, transition: "opacity 0.7s ease", touchAction: "pan-y" }}
     >
+      <Rig />
       <ambientLight intensity={Math.PI} />
       <Physics gravity={[0, -40, 0]} timeStep={1 / 60} paused={!active}>
         <Band textures={textures} />

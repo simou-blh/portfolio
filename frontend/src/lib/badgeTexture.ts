@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { Side } from "@/lib/side";
 
 /**
  * The badge art is 1099x1431. The card itself sits at x 119..977, y 72..1339
@@ -50,6 +51,7 @@ export async function composeBadge(base: string, photos: string[]): Promise<HTML
   canvas.height = OUT_H;
   const g = canvas.getContext("2d")!;
   if (!art) {
+    console.warn("[badge] image not found:", base);
     g.fillStyle = "#0b1e55";
     g.fillRect(0, 0, OUT_W, OUT_H);
     return canvas;
@@ -109,6 +111,51 @@ export async function composeBadge(base: string, photos: string[]): Promise<HTML
 export function toTexture(canvas: HTMLCanvasElement) {
   const t = new THREE.CanvasTexture(canvas);
   t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  t.needsUpdate = true;
+  return t;
+}
+
+/** Repeating lanyard texture with the name on it (u runs along the strap). */
+export async function composeStrap(side: Side): Promise<HTMLCanvasElement> {
+  try {
+    await document.fonts.ready;
+  } catch {}
+  const W = 640;
+  const H = 128;
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const g = c.getContext("2d")!;
+  const sec = side === "sec";
+  const grad = g.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, sec ? "#2a0509" : "#0d2a8a");
+  grad.addColorStop(0.5, sec ? "#14030a" : "#0a1d63");
+  grad.addColorStop(1, sec ? "#2a0509" : "#0d2a8a");
+  g.fillStyle = grad;
+  g.fillRect(0, 0, W, H);
+  // edge stitching
+  g.strokeStyle = sec ? "rgba(255,90,110,0.55)" : "rgba(143,184,255,0.6)";
+  g.lineWidth = 3;
+  g.setLineDash([10, 8]);
+  g.strokeRect(0, 10, W, H - 20);
+  g.setLineDash([]);
+  const stack =
+    getComputedStyle(document.documentElement).getPropertyValue("--font-bricolage").trim() || "system-ui, sans-serif";
+  g.font = `800 46px ${stack}`;
+  g.textBaseline = "middle";
+  g.fillStyle = "#ffffff";
+  g.fillText("AHMED OUASSIM BOULOUH", 14, H / 2 + 2);
+  g.fillStyle = sec ? "#ff3b4e" : "#7fd6ff";
+  g.fillText(sec ? "#" : "</>", W - 62, H / 2 + 2);
+  return c;
+}
+
+export function toStrapTexture(canvas: HTMLCanvasElement) {
+  const t = new THREE.CanvasTexture(canvas);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = THREE.RepeatWrapping;
+  t.wrapT = THREE.RepeatWrapping;
   t.anisotropy = 8;
   t.needsUpdate = true;
   return t;
