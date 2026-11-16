@@ -5,7 +5,6 @@ import WordReveal from "@/components/motion/WordReveal";
 import Reveal from "@/components/motion/Reveal";
 import Magnetic from "@/components/motion/Magnetic";
 import CountUp from "@/components/motion/CountUp";
-import HeroSceneLoader from "@/components/HeroSceneLoader";
 
 export default function Hero() {
   const stats = [
@@ -16,7 +15,6 @@ export default function Hero() {
   ];
   return (
     <header id="top" className="relative isolate pb-[clamp(40px,7vw,90px)] pt-[clamp(40px,9vw,120px)]">
-      <HeroSceneLoader />
       <Reveal y={16}>
         <div className="mb-6 inline-flex items-center gap-2.5 font-medium">
           <span className="dot" aria-hidden="true" />

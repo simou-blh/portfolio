@@ -5,6 +5,7 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import ScrollProgress from "@/components/motion/ScrollProgress";
 import Loader from "@/components/Loader";
+import Backdrop from "@/components/Backdrop";
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -14,7 +15,7 @@ const bricolage = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "Ahmed Ouassim Boulouh — Portfolio",
+  title: "Ahmed Ouassim Boulouh \u2014 Portfolio",
   description:
     "Computer Science student and full-stack developer building secure, useful products for Algeria.",
 };
@@ -25,14 +26,20 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const initSide = `(function(){try{if(localStorage.getItem("side")==="sec")document.documentElement.dataset.side="sec"}catch(e){}})()`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={bricolage.variable}>
+    <html lang="en" className={bricolage.variable} data-side="dev" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: initSide }} />
+      </head>
       <body>
         <noscript>
           <style>{`.loader{display:none}`}</style>
         </noscript>
         <Loader />
+        <Backdrop />
         <ScrollProgress />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
