@@ -24,7 +24,7 @@ export default function Hero() {
   return (
     <header
       id="top"
-      className="relative isolate flex min-h-[clamp(640px,92vh,880px)] flex-col justify-center gap-10 pb-[clamp(40px,7vw,90px)] pt-[clamp(16px,4vw,48px)]"
+      className="relative isolate flex min-h-[clamp(720px,100vh,960px)] flex-col justify-center gap-10 pb-[clamp(40px,7vw,90px)] pt-[clamp(16px,4vw,48px)]"
     >
       {/* full-width badge layer, behind the text */}
       <div className="absolute inset-y-0 left-1/2 z-0 w-screen -translate-x-1/2">
@@ -70,8 +70,8 @@ export default function Hero() {
         </Reveal>
       </div>
 
-      <Reveal delay={0.9} className="pointer-events-none relative z-10">
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3.5">
+      <Reveal delay={0.9} className="pointer-events-none relative z-10 lg:max-w-[52%]">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
           {stats.map((s) => (
             <div key={s.label} className="border-t-2 border-line pt-3">
               <b className="block text-[clamp(2rem,4vw,3rem)] font-extrabold leading-none">

@@ -45,7 +45,7 @@ function getLayout(w: number, h: number) {
   const visW = w / ppu;
   const visH = h / ppu;
   const j3y = FIX_Y - 3 * SEG;
-  const camY = j3y + 1.4 - visH / 2;
+  const camY = j3y + 1.0 - visH / 2;
   const z = visH / (2 * Math.tan((FOV / 2) * (Math.PI / 180)));
   const anchorX = w / h > 1.15 ? visW * 0.18 : 0;
   return { camY, z, anchorX };
