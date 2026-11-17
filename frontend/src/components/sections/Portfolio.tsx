@@ -6,8 +6,9 @@ import Section from "@/components/Section";
 import ProjectCard from "@/components/ProjectCard";
 import TechIcon from "@/components/TechIcon";
 import Tilt from "@/components/motion/Tilt";
+import CertificateModal from "@/components/CertificateModal";
 import { projects } from "@/data/projects";
-import { certifications, skillGroups } from "@/data/skills";
+import { certifications, skillGroups, type Certification } from "@/data/skills";
 import { useSide } from "@/lib/side";
 
 type TabId = "projects" | "certificates" | "stack";
@@ -83,25 +84,40 @@ function ProjectsPanel() {
 }
 
 function CertificatesPanel() {
+  const [open, setOpen] = useState<Certification | null>(null);
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-[22px]">
-      {certifications.map((c) => (
-        <Tilt key={c.title} className="glass flex h-full flex-col justify-between gap-4 rounded-2xl border border-white/15 bg-white/[0.05] p-6 backdrop-blur-xl">
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 text-mint">
-              <svg {...ico}>
-                <circle cx="12" cy="8" r="6" />
-                <path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" />
-              </svg>
-            </span>
-            <h4 className="text-[1.15rem] font-extrabold leading-snug">{c.title}</h4>
-          </div>
-          <p className="text-[0.95rem] opacity-80">
-            <span className="font-bold text-mint">{c.issuer}</span> · {c.date}
-          </p>
-        </Tilt>
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-[22px]">
+        {certifications.map((c) => (
+          <button
+            key={c.title}
+            type="button"
+            onClick={() => setOpen(c)}
+            aria-haspopup="dialog"
+            className="block h-full w-full cursor-pointer text-left"
+          >
+            <Tilt className="glass flex h-full flex-col justify-between gap-4 rounded-2xl border border-white/15 bg-white/[0.05] p-6 backdrop-blur-xl">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 text-mint">
+                  <svg {...ico}>
+                    <circle cx="12" cy="8" r="6" />
+                    <path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" />
+                  </svg>
+                </span>
+                <h4 className="text-[1.15rem] font-extrabold leading-snug">{c.title}</h4>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[0.95rem] opacity-80">
+                  <span className="font-bold text-mint">{c.issuer}</span> &middot; {c.date}
+                </p>
+                <span className="text-[0.85rem] font-bold text-mint">View</span>
+              </div>
+            </Tilt>
+          </button>
+        ))}
+      </div>
+      <CertificateModal cert={open} onClose={() => setOpen(null)} />
+    </>
   );
 }
 

@@ -14,10 +14,18 @@ export const skillGroups: { title: string; items: Tech[] }[] = [
   },
 ];
 
-export const certifications = [
-  { title: "Machine Learning Pipelines with Azure ML Studio", issuer: "Coursera", date: "Oct 2026" },
-  { title: "React Hooks Crash Course", issuer: "GreatStack", date: "Sep 2026" },
-  { title: "JavaScript Fundamentals", issuer: "GreatStack", date: "Sep 2026" },
-  { title: "Protecting a Device with Malwarebytes", issuer: "IBM SkillsBuild", date: "Sep 2026" },
-  { title: "Building WordPress Websites", issuer: "Coursera", date: "Aug 2026" },
+export type Certification = {
+  title: string;
+  issuer: string;
+  date: string;
+  file: string;
+  kind: "pdf" | "image";
+};
+
+export const certifications: Certification[] = [
+  { title: "Machine Learning Pipelines with Azure ML Studio", issuer: "Coursera", date: "Oct 2026", file: "/certificates/azure-ml-studio.pdf", kind: "pdf" },
+  { title: "React Hooks Crash Course", issuer: "GreatStack", date: "Sep 2026", file: "/certificates/react-hooks.png", kind: "image" },
+  { title: "JavaScript Fundamentals", issuer: "GreatStack", date: "Sep 2026", file: "/certificates/javascript-fundamentals.png", kind: "image" },
+  { title: "Protecting a Device with Malwarebytes", issuer: "IBM SkillsBuild", date: "Sep 2026", file: "/certificates/malwarebytes.pdf", kind: "pdf" },
+  { title: "Building WordPress Websites", issuer: "Coursera", date: "Aug 2026", file: "/certificates/wordpress.pdf", kind: "pdf" },
 ];
