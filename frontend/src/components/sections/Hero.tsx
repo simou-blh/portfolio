@@ -11,6 +11,7 @@ import Reveal from "@/components/motion/Reveal";
 import Magnetic from "@/components/motion/Magnetic";
 import CountUp from "@/components/motion/CountUp";
 import HeroBadgeLoader from "@/components/HeroBadgeLoader";
+import SocialLinks from "@/components/SocialLinks";
 
 export default function Hero() {
   const side = useSide();
@@ -19,7 +20,7 @@ export default function Hero() {
     { to: 4, suffix: "th", label: "year at ESTIN" },
     { to: projects.length, suffix: "", label: "projects shipped or prototyped" },
     { to: certifications.length, suffix: "", label: "certifications in 2026" },
-    { to: 3, suffix: "", label: "languages: AR / FR / EN" },
+    { to: 4, suffix: "", label: "languages: AR / FR / EN / DE" },
   ];
   return (
     <header
@@ -59,13 +60,19 @@ export default function Hero() {
           </motion.div>
         </AnimatePresence>
         <Reveal delay={0.75}>
-          <div className="pointer-events-auto mt-8 flex flex-wrap gap-3.5">
-            <Magnetic>
-              <a href="#projects" className="btn main">See my work</a>
-            </Magnetic>
-            <Magnetic>
-              <a href={site.linkedin} target="_blank" rel="noopener" className="btn">LinkedIn</a>
-            </Magnetic>
+          <div className="pointer-events-auto">
+            <div className="mt-8 flex flex-wrap gap-3.5">
+              <Magnetic>
+                <a href="#projects" className="btn main">See my work</a>
+              </Magnetic>
+              <Magnetic>
+                <a href={site.linkedin} target="_blank" rel="noopener" className="btn">LinkedIn</a>
+              </Magnetic>
+              <Magnetic>
+                <a href={site.cvUrl} download className="btn">Download CV</a>
+              </Magnetic>
+            </div>
+            <SocialLinks />
           </div>
         </Reveal>
       </div>

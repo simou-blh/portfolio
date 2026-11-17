@@ -8,29 +8,14 @@ import { site } from "@/data/site";
 import { aboutFocus, aboutText } from "@/data/about";
 import { useSide } from "@/lib/side";
 
-function Card({
-  label,
-  value,
-  sub,
-  delay,
-  className = "",
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  delay: number;
-  className?: string;
-}) {
-  return (
-    <Reveal delay={delay} className={className}>
-      <Tilt className="glass h-full rounded-2xl p-5">
-        <span className="text-[0.78rem] font-bold uppercase tracking-[0.14em] text-mint">{label}</span>
-        <b className="mt-2 block text-[1.25rem] font-extrabold leading-tight">{value}</b>
-        {sub && <span className="mt-1.5 block text-[0.95rem] leading-snug opacity-80">{sub}</span>}
-      </Tilt>
-    </Reveal>
-  );
-}
+const languages = [
+  { name: "Arabic", level: "Fluent" },
+  { name: "French", level: "B2" },
+  { name: "English", level: "B2" },
+  { name: "German", level: "A2" },
+];
+
+const label = "text-[0.78rem] font-bold uppercase tracking-[0.14em] text-mint";
 
 export default function About() {
   const side = useSide();
@@ -55,13 +40,36 @@ export default function About() {
         </Reveal>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Card label="Education" value="4th-year Computer Science" sub="ESTIN" delay={0.05} />
-          <Card label="Based in" value={site.location} delay={0.12} />
-          <Card label="Languages" value="Arabic / French / English" delay={0.19} />
-          <Card label="Status" value={site.status} delay={0.26} />
-          <Reveal delay={0.33} className="sm:col-span-2">
+          <Reveal delay={0.05}>
             <Tilt className="glass h-full rounded-2xl p-5">
-              <span className="text-[0.78rem] font-bold uppercase tracking-[0.14em] text-mint">Focus</span>
+              <span className={label}>Based in</span>
+              <b className="mt-2 block text-[1.25rem] font-extrabold leading-tight">{site.location}</b>
+            </Tilt>
+          </Reveal>
+          <Reveal delay={0.12}>
+            <Tilt className="glass h-full rounded-2xl p-5">
+              <span className={label}>Status</span>
+              <b className="mt-2 block text-[1.25rem] font-extrabold leading-tight">{site.status}</b>
+            </Tilt>
+          </Reveal>
+
+          <Reveal delay={0.19} className="sm:col-span-2">
+            <Tilt className="glass h-full rounded-2xl p-5">
+              <span className={label}>Languages</span>
+              <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
+                {languages.map((l) => (
+                  <li key={l.name}>
+                    <b className="block text-[1.1rem] font-extrabold leading-tight">{l.name}</b>
+                    <span className="text-[0.9rem] font-semibold text-mint">{l.level}</span>
+                  </li>
+                ))}
+              </ul>
+            </Tilt>
+          </Reveal>
+
+          <Reveal delay={0.26} className="sm:col-span-2">
+            <Tilt className="glass h-full rounded-2xl p-5">
+              <span className={label}>Focus</span>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={side}
