@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Section from "@/components/Section";
 import ProjectCard from "@/components/ProjectCard";
 import TechIcon from "@/components/TechIcon";
+import Tilt from "@/components/motion/Tilt";
 import { projects } from "@/data/projects";
 import { certifications, skillGroups } from "@/data/skills";
 import { useSide } from "@/lib/side";
@@ -85,7 +86,7 @@ function CertificatesPanel() {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-[22px]">
       {certifications.map((c) => (
-        <article key={c.title} className="card lift flex h-full flex-col justify-between gap-4">
+        <Tilt key={c.title} className="glass flex h-full flex-col justify-between gap-4 rounded-2xl border border-white/15 bg-white/[0.05] p-6 backdrop-blur-xl">
           <div className="flex items-start gap-3">
             <span className="mt-0.5 text-mint">
               <svg {...ico}>
@@ -98,7 +99,7 @@ function CertificatesPanel() {
           <p className="text-[0.95rem] opacity-80">
             <span className="font-bold text-mint">{c.issuer}</span> · {c.date}
           </p>
-        </article>
+        </Tilt>
       ))}
     </div>
   );
@@ -108,7 +109,7 @@ function StackPanel() {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] gap-[22px]">
       {skillGroups.map((g) => (
-        <div key={g.title} className="card">
+        <div key={g.title} className="glass rounded-2xl border border-white/15 bg-white/[0.05] p-5 backdrop-blur-xl">
           <h4 className="mb-4 text-[1.1rem] font-extrabold text-mint">{g.title}</h4>
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(92px,1fr))] gap-3">
             {g.items.map((t) => (
@@ -133,7 +134,7 @@ export default function Portfolio() {
   return (
     <Section id="projects" label={"03 \u2014 Portfolio"} title="Portfolio.">
       <span id="skills" aria-hidden="true" />
-      <div className="mb-8 flex justify-center sm:justify-start">
+      <div className="mb-10 flex justify-center">
         <div role="tablist" className="glass inline-flex max-w-full flex-wrap gap-1 rounded-2xl p-1.5">
           {tabs.map((t) => {
             const on = tab === t.id;
