@@ -3,6 +3,7 @@ import type { Project } from "./types";
 export const projects: Project[] = [
   {
     slug: "jouiha",
+    securityNote: "Email-based JWT auth, transaction endpoints scoped server-side to the current user, and public profiles that never expose email or phone.",
     number: "01",
     title: "Jouiha — Gaming marketplace for Algeria",
     kind: "Featured · 2026",
@@ -37,6 +38,7 @@ challenges: [
   },
   {
     slug: "lumiere-boutique",
+    securityNote: "Single-super-admin model: only the client can create or remove staff admins, and registering a second super admin fails by design. Email OTP at signup.",
     number: "02",
     title: "Lumière Boutique",
     kind: "E-commerce · Client project",
@@ -93,6 +95,7 @@ highlights: [
   },
   {
     slug: "dz-kitab",
+    securityNote: "Email-OTP signup and protected purchase requests.",
     number: "06",
     title: "DZ-KITAB",
     kind: "Second-hand books · Academic project",
@@ -102,6 +105,7 @@ highlights: [
   },
   {
     slug: "explodz",
+    securityNote: "Security hardening on the WordPress site.",
     number: "07",
     title: "EXPLODZ",
     kind: "Tourism platform · Academic project",

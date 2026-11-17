@@ -47,6 +47,10 @@ export default async function ProjectPage({ params }: Props) {
       prev={prev && { href: `/projects/${prev.slug}/`, title: prev.title }}
       next={next && { href: `/projects/${next.slug}/`, title: next.title }}
     >
+      {p.image && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={p.image} alt={p.title} className="mb-8 w-full rounded-2xl" />
+      )}
       <Block title="Overview">
         <p className="max-w-[65ch] text-[clamp(1.1rem,1.8vw,1.4rem)] font-medium text-paper/90">
           {p.overview ?? p.summary}
@@ -58,6 +62,11 @@ export default async function ProjectPage({ params }: Props) {
       {p.challenges && (
         <Block title="Challenges & decisions">
           <BulletList items={p.challenges} />
+        </Block>
+      )}
+      {p.securityNote && (
+        <Block title="Security angle">
+          <p className="max-w-[65ch] text-[1.05rem] leading-[1.5] text-paper/90">{p.securityNote}</p>
         </Block>
       )}
       <Block title="Stack">

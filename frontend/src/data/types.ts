@@ -18,6 +18,8 @@ export type Project = {
   overview?: string;
   highlights?: string[];
   challenges?: string[];
+  image?: string; // e.g. /images/projects/jouiha.png
+  securityNote?: string;
 };
 
 export type JourneyEntry = {
