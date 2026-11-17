@@ -7,9 +7,9 @@ export const site = {
   location: "Guelma, Algeria",
   cvUrl: "/Ahmed-Ouassim-Boulouh-CV.pdf",
   github: "https://github.com/simou-blh",
-  email: "your.email@example.com",
-  instagram: "https://instagram.com/YOUR_USERNAME",
-  discord: "https://discord.com/users/YOUR_DISCORD_ID",
+  email: "ouassimboulouh30@gmail.com",
+  instagram: "https://www.instagram.com/simoublh/",
+  discord: "https://discord.com/channels/@me",
   linkedin: "https://www.linkedin.com/in/boulouh-ahmed-ouassim/",
   about:
     "I'm a 4th-year Computer Science student at ESTIN in Guelma, Algeria. I design and build complete products: database, secure authentication, REST APIs and polished responsive interfaces. I like projects that solve real local problems, and I'm drawn to cybersecurity and software engineering.",

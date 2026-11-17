@@ -4,7 +4,7 @@ import ContactForm from "@/components/ContactForm";
 export default function Contact() {
   return (
     <footer id="contact" className="border-t-2 border-line pb-12 pt-[clamp(40px,7vw,80px)]">
-      <span className="mb-2.5 block font-medium text-mint">05 — Contact</span>
+      <span className="mb-2.5 block font-medium text-mint">04 — Contact</span>
       <div className="grid gap-[clamp(28px,5vw,64px)] lg:grid-cols-[1fr_1.1fr]">
         <div>
           <h2 className="mb-5 text-[clamp(2rem,5.5vw,4rem)] font-extrabold leading-none tracking-[-0.03em]">
