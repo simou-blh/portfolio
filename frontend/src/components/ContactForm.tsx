@@ -20,7 +20,7 @@ type FormValues = z.infer<typeof schema>;
 type Status = "idle" | "sending" | "success" | "error";
 
 const field =
-  "w-full rounded-xl border-2 border-paper bg-ink/40 px-4 py-3 font-medium text-paper outline-none transition placeholder:text-paper/45 focus:border-mint aria-[invalid=true]:border-coral";
+  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 font-medium text-paper outline-none transition placeholder:text-paper/45 focus:border-mint aria-[invalid=true]:border-coral";
 
 function Field({
   id, label, error, children,
@@ -93,7 +93,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="card grid gap-5">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-5">
       <Field id="name" label="Name" error={errors.name?.message}>
         <input
           id="name" autoComplete="name" placeholder="Your name" className={field}
