@@ -7,9 +7,8 @@ import { toggleSide, useSide } from "@/lib/side";
 const links = [
   { label: "Home", id: "top", mobile: true },
   { label: "About", id: "about", mobile: true },
-  { label: "Projects", id: "projects", mobile: true },
-  { label: "Experience", id: "experience", mobile: false },
-  { label: "Skills", id: "skills", mobile: false },
+  { label: "Education", id: "experience", mobile: false },
+  { label: "Portfolio", id: "projects", mobile: true },
   { label: "Contact", id: "contact", mobile: true },
 ];
 
