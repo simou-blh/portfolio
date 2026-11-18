@@ -129,7 +129,7 @@ export default function ContactForm() {
 
       <button
         type="submit" disabled={status === "sending"}
-        className="btn main w-full cursor-pointer justify-center gap-2.5 disabled:cursor-wait disabled:opacity-60"
+        className="flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-mint px-6 py-3.5 text-[1.05rem] font-bold text-white shadow-lg shadow-mint/30 transition hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-wait disabled:opacity-60"
       >
         <FaRegPaperPlane aria-hidden="true" />
         {status === "sending" ? "Sending..." : "Send message"}

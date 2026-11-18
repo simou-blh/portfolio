@@ -1,21 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { FaRegCommentDots, FaRegPaperPlane, FaRegUser } from "react-icons/fa6";
+import { useEffect, useRef, useState } from "react";
+import { FaRegCommentDots, FaRegImage, FaRegPaperPlane, FaRegUser, FaXmark } from "react-icons/fa6";
 
-type Comment = { id: string; name: string; message: string; created_at: string };
+type Comment = {
+  id: string;
+  name: string;
+  message: string;
+  avatar_url: string | null;
+  created_at: string;
+};
 
 const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SB_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const api = (q = "") => `${SB_URL}/rest/v1/comments${q}`;
+
+// new sb_publishable_ keys go in the apikey header only; legacy JWT keys also need Bearer
 const baseHeaders: Record<string, string> = {
   apikey: SB_KEY ?? "",
   "Content-Type": "application/json",
 };
 if (SB_KEY?.startsWith("eyJ")) baseHeaders.Authorization = `Bearer ${SB_KEY}`;
 
+const MAX_BYTES = 5 * 1024 * 1024;
+const AVATAR_PX = 256;
+
 const field =
   "w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-11 pr-4 font-medium text-paper outline-none transition placeholder:text-paper/45 focus:border-mint";
+const sendBtn =
+  "flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-mint px-6 py-3.5 text-[1.05rem] font-bold text-white shadow-lg shadow-mint/30 transition hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-wait disabled:opacity-60";
 
 function timeAgo(iso: string) {
   const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
@@ -29,6 +42,52 @@ function timeAgo(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
+// center-crop to a square and shrink to 256px JPEG before uploading
+async function makeAvatar(file: File): Promise<Blob> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error("image"));
+      i.src = url;
+    });
+    const side = Math.min(img.naturalWidth, img.naturalHeight);
+    const canvas = document.createElement("canvas");
+    canvas.width = AVATAR_PX;
+    canvas.height = AVATAR_PX;
+    const g = canvas.getContext("2d")!;
+    g.drawImage(
+      img,
+      (img.naturalWidth - side) / 2,
+      (img.naturalHeight - side) / 2,
+      side,
+      side,
+      0,
+      0,
+      AVATAR_PX,
+      AVATAR_PX,
+    );
+    return await new Promise<Blob>((res, rej) =>
+      canvas.toBlob((b) => (b ? res(b) : rej(new Error("blob"))), "image/jpeg", 0.85),
+    );
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function Avatar({ name, src }: { name: string; src: string | null }) {
+  if (src) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={src} alt="" width={44} height={44} loading="lazy" className="h-11 w-11 shrink-0 rounded-full object-cover" />;
+  }
+  return (
+    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/10 font-extrabold uppercase text-mint">
+      {name.trim().charAt(0) || "?"}
+    </span>
+  );
+}
+
 export default function Comments() {
   const enabled = Boolean(SB_URL && SB_KEY);
   const [items, setItems] = useState<Comment[]>([]);
@@ -37,13 +96,15 @@ export default function Comments() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [trap, setTrap] = useState("");
+  const [photo, setPhoto] = useState<{ blob: Blob; preview: string } | null>(null);
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!enabled) return;
     let alive = true;
-    fetch(api("?select=id,name,message,created_at&order=created_at.desc&limit=50"), {
+    fetch(api("?select=id,name,message,avatar_url,created_at&order=created_at.desc&limit=50"), {
       headers: { ...baseHeaders, Prefer: "count=exact" },
     })
       .then(async (r) => {
@@ -61,6 +122,27 @@ export default function Comments() {
     };
   }, [enabled]);
 
+  function removePhoto() {
+    if (photo) URL.revokeObjectURL(photo.preview);
+    setPhoto(null);
+  }
+
+  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    if (!f.type.startsWith("image/")) return setErr("Please choose an image file.");
+    if (f.size > MAX_BYTES) return setErr("This photo is larger than 5 MB.");
+    try {
+      const blob = await makeAvatar(f);
+      removePhoto();
+      setPhoto({ blob, preview: URL.createObjectURL(blob) });
+      setErr("");
+    } catch {
+      setErr("Could not read this image.");
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (trap) return; // honeypot
@@ -77,10 +159,21 @@ export default function Comments() {
     setSending(true);
     setErr("");
     try {
+      let avatar_url: string | null = null;
+      if (photo) {
+        const file = `${crypto.randomUUID()}.jpg`;
+        const up = await fetch(`${SB_URL}/storage/v1/object/avatars/${file}`, {
+          method: "POST",
+          headers: { ...baseHeaders, "Content-Type": "image/jpeg" },
+          body: photo.blob,
+        });
+        if (!up.ok) throw new Error("upload");
+        avatar_url = `${SB_URL}/storage/v1/object/public/avatars/${file}`;
+      }
       const r = await fetch(api(), {
         method: "POST",
         headers: { ...baseHeaders, Prefer: "return=representation" },
-        body: JSON.stringify({ name: n, message: m }),
+        body: JSON.stringify({ name: n, message: m, avatar_url }),
       });
       if (!r.ok) throw new Error("post");
       const [row]: Comment[] = await r.json();
@@ -88,11 +181,16 @@ export default function Comments() {
       setTotal((t) => t + 1);
       setName("");
       setMessage("");
+      removePhoto();
       try {
         localStorage.setItem("cm_last", String(Date.now()));
       } catch {}
-    } catch {
-      setErr("Could not post your comment. Please try again.");
+    } catch (e2) {
+      setErr(
+        e2 instanceof Error && e2.message === "upload"
+          ? "Could not upload the photo. Remove it or try again."
+          : "Could not post your comment. Please try again.",
+      );
     } finally {
       setSending(false);
     }
@@ -126,6 +224,7 @@ export default function Comments() {
                 />
               </div>
             </div>
+
             <div>
               <label htmlFor="cm-msg" className="mb-1.5 block font-medium">Comment</label>
               <div className="relative">
@@ -138,15 +237,39 @@ export default function Comments() {
                 />
               </div>
             </div>
+
+            <div>
+              <span className="mb-1.5 block font-medium">Profile photo (optional)</span>
+              <input ref={fileRef} type="file" accept="image/*" onChange={pick} className="hidden" />
+              {photo ? (
+                <div className="flex items-center gap-4 rounded-xl border border-white/15 bg-white/5 p-3">
+                  <Avatar name="" src={photo.preview} />
+                  <span className="grow text-[0.95rem] opacity-80">Photo ready</span>
+                  <button
+                    type="button" onClick={removePhoto}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-[0.9rem] font-bold transition hover:bg-white/10"
+                  >
+                    <FaXmark aria-hidden="true" /> Remove
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button" onClick={() => fileRef.current?.click()}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-dashed border-white/25 bg-white/[0.03] py-4 font-bold transition hover:border-mint/60 hover:bg-white/[0.06]"
+                >
+                  <FaRegImage aria-hidden="true" /> Choose profile photo
+                </button>
+              )}
+              <p className="mt-2 text-center text-[0.85rem] opacity-60">Max file size 5 MB</p>
+            </div>
+
             {/* honeypot */}
             <input
               value={trap} onChange={(e) => setTrap(e.target.value)} tabIndex={-1}
               autoComplete="off" aria-hidden="true" className="hidden" name="website"
             />
-            <button
-              type="submit" disabled={sending}
-              className="btn main w-full cursor-pointer justify-center gap-2.5 disabled:cursor-wait disabled:opacity-60"
-            >
+
+            <button type="submit" disabled={sending} className={sendBtn}>
               <FaRegPaperPlane aria-hidden="true" />
               {sending ? "Sending..." : "Send comment"}
             </button>
@@ -162,9 +285,7 @@ export default function Comments() {
               <ul className="divide-y divide-white/10">
                 {items.map((c) => (
                   <li key={c.id} className="flex gap-4 py-4">
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/10 font-extrabold uppercase text-mint">
-                      {c.name.trim().charAt(0) || "?"}
-                    </span>
+                    <Avatar name={c.name} src={c.avatar_url} />
                     <div className="min-w-0 grow">
                       <div className="flex items-baseline justify-between gap-3">
                         <b className="truncate font-bold">{c.name}</b>
