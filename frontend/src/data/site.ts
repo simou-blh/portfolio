@@ -9,7 +9,7 @@ export const site = {
   github: "https://github.com/simou-blh",
   email: "ouassimboulouh30@gmail.com",
   instagram: "https://www.instagram.com/simoublh/",
-  discord: "https://discord.com/channels/@me",
+  discord: "https://discord.com/users/1167209706901753916",
   linkedin: "https://www.linkedin.com/in/boulouh-ahmed-ouassim/",
   about:
     "I'm a 4th-year Computer Science student at ESTIN in Amizour, Bejaia, Algeria. I design and build complete products: database, secure authentication, REST APIs and polished responsive interfaces. I like projects that solve real local problems, and I'm drawn to cybersecurity and software engineering.",

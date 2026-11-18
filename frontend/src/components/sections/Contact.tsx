@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import { FaDiscord, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
 import { site } from "@/data/site";
 import ContactForm from "@/components/ContactForm";
 import Comments from "@/components/Comments";
@@ -7,7 +7,7 @@ import Reveal from "@/components/motion/Reveal";
 
 const links: { name: string; handle: string; href: string; icon: ReactNode }[] = [
   { name: "LinkedIn", handle: "boulouh-ahmed-ouassim", href: site.linkedin, icon: <FaLinkedinIn /> },
-  { name: "GitHub", handle: "@simou-blh", href: site.github, icon: <FaGithub /> },
+  { name: "Discord", handle: "Message me on Discord", href: site.discord, icon: <FaDiscord /> },
   { name: "Instagram", handle: "@simoublh", href: site.instagram, icon: <FaInstagram /> },
 ];
 
