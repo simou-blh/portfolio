@@ -6,13 +6,14 @@ import {
   SiReact, SiNextdotjs, SiNodedotjs, SiTypescript, SiJavascript, SiDocker, SiGit,
   SiTailwindcss, SiPython, SiPostgresql, SiMongodb, SiTensorflow, SiPytorch,
   SiHuggingface, SiKalilinux, SiLinux, SiBurpsuite, SiOwasp, SiJsonwebtokens, SiWireshark,
+  SiMetasploit, SiHackthebox, SiTryhackme, SiBitwarden, SiLetsencrypt, SiOpenssl, SiTorproject, SiProtonvpn, SiGnuprivacyguard, SiVirustotal,
 } from "react-icons/si";
 import { useSide } from "@/lib/side";
 import type { Side } from "@/lib/side";
 
 type RGB = [number, number, number];
 type Star = { x: number; y: number; v: number; r: number; a: number; tf: number; ph: number; tint: boolean };
-type Item = { x: number; y: number; vy: number; sway: number; swayF: number; ph: number; rot: number; d: number; label: string };
+type Item = { x: number; y: number; vy: number; sway: number; swayF: number; ph: number; rot: number; d: number; label: string; next: string | null; sw: number };
 type Comet = { x: number; y: number; vx: number; vy: number; len: number };
 
 const ACCENT: Record<Side, RGB> = { dev: [110, 231, 200], sec: [248, 113, 113] };
@@ -39,6 +40,16 @@ const LOGOS: Record<string, { Icon: ComponentType<{ size?: number; color?: strin
   owasp: { Icon: SiOwasp, color: "#FFFFFF" },
   jwt: { Icon: SiJsonwebtokens, color: "#D63AFF" },
   wireshark: { Icon: SiWireshark, color: "#1679A7" },
+  metasploit: { Icon: SiMetasploit, color: "#2596CD" },
+  htb: { Icon: SiHackthebox, color: "#9FEF00" },
+  thm: { Icon: SiTryhackme, color: "#C11111" },
+  bitwarden: { Icon: SiBitwarden, color: "#175DDC" },
+  letsencrypt: { Icon: SiLetsencrypt, color: "#FFFFFF" },
+  openssl: { Icon: SiOpenssl, color: "#721412" },
+  tor: { Icon: SiTorproject, color: "#7D4698" },
+  proton: { Icon: SiProtonvpn, color: "#6D4AFF" },
+  gpg: { Icon: SiGnuprivacyguard, color: "#0093DD" },
+  virustotal: { Icon: SiVirustotal, color: "#394EFF" },
 };
 
 // keys in LOGOS = brand logo, keys starting with "#" = drawn icons
@@ -48,8 +59,8 @@ const POOL: Record<Side, string[]> = {
     "tensorflow", "pytorch", "hf", "#atom", "#net", "#chip", "#atom", "#net",
   ],
   sec: [
-    "kali", "linux", "burp", "owasp", "jwt", "wireshark", "python", "docker", "git",
-    "#shield", "#shield", "#chip", "#net",
+    "kali", "linux", "burp", "owasp", "jwt", "wireshark", "metasploit", "htb", "thm", "bitwarden", "letsencrypt", "openssl", "tor", "proton", "gpg", "virustotal",
+    "#shield", "#shield", "#shield",
   ],
 };
 
@@ -199,7 +210,7 @@ export default function Backdrop() {
         ph: rand(0, 6.28),
         rot: rand(-0.25, 0.25),
         d,
-        label: pick(),
+        label: pick(), next: null, sw: 1,
       };
     };
 
@@ -224,7 +235,7 @@ export default function Backdrop() {
       // badge flipped: give every floating item a logo from the new side
       if (sideRef.current !== lastSide) {
         lastSide = sideRef.current;
-        for (const it of items) it.label = pick();
+        for (const it of items) setTimeout(() => { it.next = pick(); }, Math.random() * 700);
       }
 
       const target = ACCENT[sideRef.current];
@@ -299,11 +310,13 @@ export default function Backdrop() {
         const rot = it.rot + Math.sin(t * 0.4 + it.ph) * 0.15;
         const fade = clamp(it.y / 140, 0, 1) * clamp((h + 60 - it.y) / 140, 0, 1);
         const alpha = 0.85 * fade * clamp(it.d, 0.6, 1);
+        if (it.next) { it.sw -= dt * 4; if (it.sw <= 0) { it.label = it.next; it.next = null; } } else if (it.sw < 1) { it.sw = Math.min(1, it.sw + dt * 4); }
         if (alpha <= 0.01) continue;
 
         g.save();
         g.translate(x, it.y);
         g.rotate(rot);
+        g.scale(Math.max(0.001, it.sw), Math.max(0.001, it.sw));
         g.globalAlpha = alpha;
         g.strokeStyle = `rgba(${ac},0.9)`;
         g.fillStyle = `rgba(${ac},0.9)`;
