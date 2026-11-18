@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ComponentType } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import {
+  SiReact, SiNextdotjs, SiNodedotjs, SiTypescript, SiJavascript, SiDocker, SiGit,
+  SiTailwindcss, SiPython, SiPostgresql, SiMongodb, SiTensorflow, SiPytorch,
+  SiHuggingface, SiKalilinux, SiLinux, SiBurpsuite, SiOwasp, SiJsonwebtokens, SiWireshark,
+} from "react-icons/si";
 import { useSide } from "@/lib/side";
 import type { Side } from "@/lib/side";
 
@@ -11,15 +17,39 @@ type Comet = { x: number; y: number; vx: number; vy: number; len: number };
 
 const ACCENT: Record<Side, RGB> = { dev: [110, 231, 200], sec: [248, 113, 113] };
 
-// labels starting with "#" are drawn icons, the rest are chips
+// real brand logos (key -> icon + colour). If tsc says an icon doesn't exist, delete its line here and in POOL.
+const LOGOS: Record<string, { Icon: ComponentType<{ size?: number; color?: string }>; color: string }> = {
+  react: { Icon: SiReact, color: "#61DAFB" },
+  next: { Icon: SiNextdotjs, color: "#FFFFFF" },
+  node: { Icon: SiNodedotjs, color: "#5FA04E" },
+  ts: { Icon: SiTypescript, color: "#3178C6" },
+  js: { Icon: SiJavascript, color: "#F7DF1E" },
+  docker: { Icon: SiDocker, color: "#2496ED" },
+  git: { Icon: SiGit, color: "#F05032" },
+  tailwind: { Icon: SiTailwindcss, color: "#06B6D4" },
+  python: { Icon: SiPython, color: "#4B8BBE" },
+  postgres: { Icon: SiPostgresql, color: "#5B86E5" },
+  mongo: { Icon: SiMongodb, color: "#47A248" },
+  tensorflow: { Icon: SiTensorflow, color: "#FF6F00" },
+  pytorch: { Icon: SiPytorch, color: "#EE4C2C" },
+  hf: { Icon: SiHuggingface, color: "#FFD21E" },
+  kali: { Icon: SiKalilinux, color: "#6AA0C8" },
+  linux: { Icon: SiLinux, color: "#FCC624" },
+  burp: { Icon: SiBurpsuite, color: "#FF6633" },
+  owasp: { Icon: SiOwasp, color: "#FFFFFF" },
+  jwt: { Icon: SiJsonwebtokens, color: "#D63AFF" },
+  wireshark: { Icon: SiWireshark, color: "#1679A7" },
+};
+
+// keys in LOGOS = brand logo, keys starting with "#" = drawn icons
 const POOL: Record<Side, string[]> = {
   dev: [
-    "</>", "React", "Next.js", "Node.js", "TypeScript", "REST API", "SQL", "Docker", "Git", "{ }", "npm",
-    "Tailwind", "AI", "LLM", "ML", "Python", "Agent", "RAG", "Tensor", "#atom", "#net", "#chip", "#atom", "#net",
+    "react", "next", "node", "ts", "js", "docker", "git", "tailwind", "python", "postgres", "mongo",
+    "tensorflow", "pytorch", "hf", "#atom", "#net", "#chip", "#atom", "#net",
   ],
   sec: [
-    "Auth", "JWT", "XSS", "SQLi", "Nmap", "Kali", "Burp", "TLS", "OWASP", "CVE", "CSRF", "Hash",
-    "Linux", "Python", "AI", "REST API", "#shield", "#shield", "#chip", "#net", "</>",
+    "kali", "linux", "burp", "owasp", "jwt", "wireshark", "python", "docker", "git",
+    "#shield", "#shield", "#chip", "#net",
   ],
 };
 
@@ -98,6 +128,18 @@ function drawIcon(g: CanvasRenderingContext2D, kind: string, s: number) {
   }
 }
 
+// turn each react-icon into an <img> once, so the canvas can drawImage() it every frame
+function loadLogos() {
+  const out: Record<string, HTMLImageElement> = {};
+  for (const [key, { Icon, color }] of Object.entries(LOGOS)) {
+    const svg = renderToStaticMarkup(<Icon size={64} color={color} />);
+    const img = new Image();
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    out[key] = img;
+  }
+  return out;
+}
+
 export default function Backdrop() {
   const ref = useRef<HTMLCanvasElement>(null);
   const side = useSide();
@@ -113,6 +155,7 @@ export default function Backdrop() {
     const g = canvas.getContext("2d");
     if (!g) return;
 
+    const logos = loadLogos();
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const k = reduce ? 0.15 : 1;
     let w = 0;
@@ -120,10 +163,16 @@ export default function Backdrop() {
     let raf = 0;
     let last = performance.now();
     let nextComet = last + 1500;
+    let lastSide: Side = sideRef.current;
     let stars: Star[] = [];
     let items: Item[] = [];
     const comets: Comet[] = [];
     const cur: RGB = [...ACCENT[sideRef.current]] as RGB;
+
+    const pick = () => {
+      const pool = POOL[sideRef.current];
+      return pool[Math.floor(Math.random() * pool.length)];
+    };
 
     const newStar = (initial: boolean): Star => {
       const z = rand(0.15, 1);
@@ -140,7 +189,6 @@ export default function Backdrop() {
     };
 
     const newItem = (initial: boolean): Item => {
-      const pool = POOL[sideRef.current];
       const d = rand(0.65, 1.25);
       return {
         x: rand(0.04, 0.96) * w,
@@ -151,7 +199,7 @@ export default function Backdrop() {
         ph: rand(0, 6.28),
         rot: rand(-0.25, 0.25),
         d,
-        label: pool[Math.floor(Math.random() * pool.length)],
+        label: pick(),
       };
     };
 
@@ -172,6 +220,12 @@ export default function Backdrop() {
       last = now;
       const t = now / 1000;
       g.clearRect(0, 0, w, h);
+
+      // badge flipped: give every floating item a logo from the new side
+      if (sideRef.current !== lastSide) {
+        lastSide = sideRef.current;
+        for (const it of items) it.label = pick();
+      }
 
       const target = ACCENT[sideRef.current];
       for (let i = 0; i < 3; i++) cur[i] += (target[i] - cur[i]) * Math.min(1, dt * 3);
@@ -237,14 +291,14 @@ export default function Backdrop() {
         g.fill();
       }
 
-      // floating dev / AI items
+      // floating logos / icons
       for (const it of items) {
         it.y += it.vy * dt * k;
         if (it.y < -80) Object.assign(it, newItem(false));
         const x = it.x + Math.sin(t * it.swayF + it.ph) * it.sway;
         const rot = it.rot + Math.sin(t * 0.4 + it.ph) * 0.15;
         const fade = clamp(it.y / 140, 0, 1) * clamp((h + 60 - it.y) / 140, 0, 1);
-        const alpha = 0.7 * fade * clamp(it.d, 0.6, 1);
+        const alpha = 0.85 * fade * clamp(it.d, 0.6, 1);
         if (alpha <= 0.01) continue;
 
         g.save();
@@ -258,24 +312,23 @@ export default function Backdrop() {
           g.shadowBlur = 10;
           drawIcon(g, it.label, 17 * it.d);
         } else {
-          g.font = `600 ${Math.round(13 * it.d)}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
-          const tw = g.measureText(it.label).width;
-          const px = 10 * it.d;
-          const ph = 26 * it.d;
+          const img = logos[it.label];
+          const R = 20 * it.d; // glass disc radius
+          // soft glass disc behind the logo
           g.shadowColor = `rgba(${ac},0.5)`;
-          g.shadowBlur = 10;
+          g.shadowBlur = 12;
           g.fillStyle = `rgba(${ac},0.08)`;
-          g.strokeStyle = `rgba(${ac},0.5)`;
+          g.strokeStyle = `rgba(${ac},0.45)`;
           g.lineWidth = 1;
           g.beginPath();
-          g.roundRect(-tw / 2 - px, -ph / 2, tw + px * 2, ph, ph / 2);
+          g.arc(0, 0, R, 0, Math.PI * 2);
           g.fill();
           g.stroke();
           g.shadowBlur = 0;
-          g.fillStyle = `rgba(${ac},0.95)`;
-          g.textAlign = "center";
-          g.textBaseline = "middle";
-          g.fillText(it.label, 0, 1);
+          if (img && img.complete && img.naturalWidth > 0) {
+            const s = R * 1.15;
+            g.drawImage(img, -s / 2, -s / 2, s, s);
+          }
         }
         g.restore();
       }
